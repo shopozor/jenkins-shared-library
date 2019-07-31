@@ -21,13 +21,17 @@ def buildDockerImage() {
 }
 
 def deploy(backendJps, backendEnvName) {
-  sh "chmod u+x ./common/e2e/deploy-to-jelastic.sh"
-  sh "./common/e2e/deploy-to-jelastic.sh $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $backendEnvName cp $backendJps"
+  SCRIPT_TO_RUN = './common/e2e/deploy-to-jelastic.sh'
+  sh "dos2unix $SCRIPT_TO_RUN"
+  sh "chmod u+x $SCRIPT_TO_RUN"
+  sh "$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $backendEnvName cp $backendJps"
 }
 
 def runE2eTests(e2eJps, envName) {
-  sh "chmod u+x ./common/e2e/run-e2e.sh"
-  sh "./common/e2e/run-e2e.sh $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $envName cp $e2eJps"
+  SCRIPT_TO_RUN = './common/e2e/run-e2e.sh'
+  sh "dos2unix $SCRIPT_TO_RUN"
+  sh "chmod u+x $SCRIPT_TO_RUN"
+  sh "$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $envName cp $e2eJps"
 }
 
 def resetDatabase(e2eJps, envName) {
@@ -44,8 +48,10 @@ def retrieveTestResults(jenkinsEnvName, targetNodeGroup, targetPath, frontendNam
   deleteFolder(TEST_REPORTS_FOLDER)
   deleteFolder(VIDEOS_FOLDER)
   deleteFolder(SCREENSHOTS_FOLDER)
-  sh "chmod u+x ./common/e2e/mount-test-results.sh"
-  sh "./common/e2e/mount-test-results.sh $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $jenkinsEnvName $targetNodeGroup $targetPath $frontendName $sourceNodeGroup $PATH_TO_TEST_RESULTS"
+  SCRIPT_TO_RUN = './common/e2e/mount-test-results.sh'
+  sh "dos2unix $SCRIPT_TO_RUN"
+  sh "chmod u+x $SCRIPT_TO_RUN"
+  sh "$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $jenkinsEnvName $targetNodeGroup $targetPath $frontendName $sourceNodeGroup $PATH_TO_TEST_RESULTS"
   sh "cp -R ${targetPath}/cypress/${SCREENSHOTS_FOLDER} ."
   sh "cp -R ${targetPath}/cypress/${VIDEOS_FOLDER} ."
   sh "cp -R ${targetPath}/${TEST_REPORTS_FOLDER} ."
@@ -57,8 +63,10 @@ def buildArtifacts() {
 }
 
 def stopEnvironment(envName) {
-  sh "chmod u+x ./common/e2e/stop-jelastic-env.sh"
-  sh "./common/e2e/stop-jelastic-env.sh $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $envName"
+  SCRIPT_TO_RUN = './common/e2e/stop-jelastic-env.sh'
+  sh "dos2unix $SCRIPT_TO_RUN"
+  sh "chmod u+x $SCRIPT_TO_RUN"
+  sh "$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $envName"
 }
 
 return this
