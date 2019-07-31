@@ -21,17 +21,17 @@ def buildDockerImage() {
 }
 
 def deploy(backendJps, backendEnvName) {
-  // sh "dos2unix ./common/e2e/helpers.sh"
+  sh "dos2unix ./common/e2e/helpers.sh"
   SCRIPT_TO_RUN = './common/e2e/deploy-to-jelastic.sh'
-  // sh "dos2unix $SCRIPT_TO_RUN"
+  sh "dos2unix $SCRIPT_TO_RUN"
   sh "chmod u+x $SCRIPT_TO_RUN"
   sh "$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $backendEnvName cp $backendJps"
 }
 
 def runE2eTests(e2eJps, envName) {
-  // sh "dos2unix ./common/e2e/helpers.sh"
+  sh "dos2unix ./common/e2e/helpers.sh"
   SCRIPT_TO_RUN = './common/e2e/run-e2e.sh'
-  // sh "dos2unix $SCRIPT_TO_RUN"
+  sh "dos2unix $SCRIPT_TO_RUN"
   sh "chmod u+x $SCRIPT_TO_RUN"
   sh "$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $envName cp $e2eJps"
 }
@@ -50,9 +50,9 @@ def retrieveTestResults(jenkinsEnvName, targetNodeGroup, targetPath, frontendNam
   deleteFolder(TEST_REPORTS_FOLDER)
   deleteFolder(VIDEOS_FOLDER)
   deleteFolder(SCREENSHOTS_FOLDER)
-  // sh "dos2unix ./common/e2e/helpers.sh"
+  sh "dos2unix ./common/e2e/helpers.sh"
   SCRIPT_TO_RUN = './common/e2e/mount-test-results.sh'
-  // sh "dos2unix $SCRIPT_TO_RUN"
+  sh "dos2unix $SCRIPT_TO_RUN"
   sh "chmod u+x $SCRIPT_TO_RUN"
   sh "$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $jenkinsEnvName $targetNodeGroup $targetPath $frontendName $sourceNodeGroup $PATH_TO_TEST_RESULTS"
   sh "cp -R ${targetPath}/cypress/${SCREENSHOTS_FOLDER} ."
@@ -66,9 +66,9 @@ def buildArtifacts() {
 }
 
 def stopEnvironment(envName) {
-  // sh "dos2unix ./common/e2e/helpers.sh"
+  sh "dos2unix ./common/e2e/helpers.sh"
   SCRIPT_TO_RUN = './common/e2e/stop-jelastic-env.sh'
-  // sh "dos2unix $SCRIPT_TO_RUN"
+  sh "dos2unix $SCRIPT_TO_RUN"
   sh "chmod u+x $SCRIPT_TO_RUN"
   sh "$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $envName"
 }
