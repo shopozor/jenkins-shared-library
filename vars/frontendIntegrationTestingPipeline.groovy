@@ -27,7 +27,7 @@ def call() {
         steps {
           script {
             helpers.deleteFolder(REPORTS_FOLDER)
-            sh "CYPRESS_CACHE_FOLDER=$WORKSPACE/.cache yarn start:ci"
+            sh "CYPRESS_CACHE_FOLDER=$WORKSPACE/.cache yarn start:integration:ci"
           }
         }
       }
