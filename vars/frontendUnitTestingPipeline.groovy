@@ -8,7 +8,7 @@ def call() {
     stages {
       stage('Node Modules Installation') {
         steps {
-          sh "CYPRESS_CACHE_FOLDER=$WORKSPACE/.cache yarn"
+          sh "yarn"
         }
       }
       stage('Performing unit tests') {
