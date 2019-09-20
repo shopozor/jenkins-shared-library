@@ -11,14 +11,14 @@ def call() {
           sh "CYPRESS_CACHE_FOLDER=$WORKSPACE/.cache yarn"
         }
       }
-      stage('Building application') {
-        environment {
-          GRAPHQL_API = 'http://localhost:8000/graphql/'
-        }
-        steps {
-          sh "yarn build"
-        }
-      }
+      // stage('Building application') {
+      //   environment {
+      //     GRAPHQL_API = 'http://localhost:8000/graphql/'
+      //   }
+      //   steps {
+      //     sh "yarn build"
+      //   }
+      // }
       stage('Performing unit tests') {
         steps {
           script {
