@@ -44,7 +44,7 @@ def call(Map params) {
           script {
             def E2E_JPS = './common/e2e/e2e.jps'
             def FRONTEND_JPS = './common/e2e/manifest.jps'
-            sh "cp e2e/Dockerfile ."
+            sh "cp cypress/e2e/Dockerfile ."
             helpers.buildDockerImage()
             helpers.prepareFrontendConfiguration(FRONTEND_NAME, FRONTEND_JPS, E2E_JPS)
             helpers.deploy(FRONTEND_JPS, FRONTEND_NAME)
