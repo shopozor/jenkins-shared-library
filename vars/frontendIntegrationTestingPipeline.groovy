@@ -7,7 +7,7 @@ def call() {
       }
     }
     environment {
-      REPORTS_FOLDER = 'junit-reports'    
+      REPORTS_FOLDER = 'junit-reports'
     }
     stages {
       stage('Node Modules Installation') {
@@ -27,7 +27,7 @@ def call() {
         steps {
           script {
             helpers.deleteFolder(REPORTS_FOLDER)
-            sh "CYPRESS_CACHE_FOLDER=$WORKSPACE/.cache yarn start:integration:ci"
+            sh "CYPRESS_CACHE_FOLDER=$WORKSPACE/.cache yarn start:integration"
           }
         }
       }
