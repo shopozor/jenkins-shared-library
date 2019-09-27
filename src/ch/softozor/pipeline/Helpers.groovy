@@ -19,10 +19,11 @@ def publishDockerImage(frontendName, branch, graphqlApi, enableDevTools, imageTy
   sh "docker push $DOCKER_REPO"
 }
 
-def deploy(backendJps, backendEnvName, tag) {
+def deploy(backendJps, backendEnvName, branch, imageType) {
   sh "dos2unix ./common/e2e/helpers.sh"
-  sh "sed -i \"s/DEPLOY_MODE/e2e/g\" $backendJps"
-  sh "sed -i \"s/DOCKER_TAG/$tag/g\" $backendJps"
+  sh "sed -i \"s/APP_NAME/$backendEnvName/g\" $backendJps"
+  sh "sed -i \"s/IMAGE_TYPE/$imageType/g\" $backendJps"
+  sh "sed -i \"s/BRANCH/$branch/g\" $backendJps"
   SCRIPT_TO_RUN = './common/e2e/deploy-to-jelastic.sh'
   sh "chmod u+x $SCRIPT_TO_RUN"
   sh "dos2unix $SCRIPT_TO_RUN"

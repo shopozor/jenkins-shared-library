@@ -6,6 +6,7 @@ def call(Map params) {
       BACKEND_BRANCH = 'dev'
       BACKEND_NAME = credentials("${params.frontendType}-backend-name-credentials") // contains envName + base jps url
       FRONTEND_NAME = credentials("${params.frontendType}-frontend-name-credentials") // contains envName
+      IMAGE_TYPE = 'e2e'
       JELASTIC_APP_CREDENTIALS = credentials('jelastic-app-credentials')
       JELASTIC_CREDENTIALS = credentials('jelastic-credentials')
       PATH_TO_TEST_RESULTS = '/home/node'
@@ -18,7 +19,8 @@ def call(Map params) {
         steps {
           build job: 'backend-publish-docker-image', parameters: [
             booleanParam(name: 'ENABLE_DEV_TOOLS', value: true),
-            string(name: 'BRANCH', value: $BACKEND_BRANCH)
+            string(name: 'BRANCH', value: BACKEND_BRANCH),
+            string(name: 'IMAGE_TYPE', value: IMAGE_TYPE)
           ]
         }
       }
@@ -31,7 +33,7 @@ def call(Map params) {
         steps {
           script {
             helpers.prepareBackendConfiguration(BACKEND_JPS, E2E_JPS, BACKEND_NAME_PSW)
-            helpers.deploy(BACKEND_JPS, BACKEND_NAME_USR, $BACKEND_BRANCH)
+            helpers.deploy(BACKEND_JPS, BACKEND_NAME_USR, BACKEND_BRANCH, IMAGE_TYPE)
             helpers.resetDatabase(E2E_JPS, BACKEND_NAME_USR)
           }
         }
@@ -55,11 +57,9 @@ def call(Map params) {
         steps {
           script {
             E2E_JPS = './common/e2e/e2e.jps'
-            FRONTEND_JPS = './common/e2e/manifest.jps'
+            FRONTEND_JPS = './common/manifest.jps'
             helpers.prepareFrontendConfiguration(FRONTEND_NAME, FRONTEND_JPS, E2E_JPS)
-            // TODO: also make sure that the correct docker image is deployed; 
-            //       we only tell what tag to use; the manifest should already have the correct image name
-            helpers.deploy(FRONTEND_JPS, FRONTEND_NAME, GIT_COMMIT)
+            helpers.deploy(FRONTEND_JPS, FRONTEND_NAME, GIT_COMMIT, IMAGE_TYPE)
             helpers.runE2eTests(E2E_JPS, FRONTEND_NAME)
           }
         }
