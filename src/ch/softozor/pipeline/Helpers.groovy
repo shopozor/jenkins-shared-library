@@ -26,14 +26,15 @@ def publishFrontendDockerImage(frontendName, branch, graphqlApi, enableDevTools,
   sh "docker push $DOCKER_REPO"
 }
 
-def deploy(backendJps, backendEnvName, branch, imageType) {
+def deploy(backendJps, appName, backendEnvName, branch, imageType) {
   sh "dos2unix ./common/e2e/helpers.sh"
-  sh "sed -i \"s/APP_NAME/$backendEnvName/g\" $backendJps"
+  sh "sed -i \"s/APP_NAME/$appName/g\" $backendJps"
   sh "sed -i \"s/IMAGE_TYPE/$imageType/g\" $backendJps"
   sh "sed -i \"s/BRANCH/$branch/g\" $backendJps"
   SCRIPT_TO_RUN = './common/e2e/deploy-to-jelastic.sh'
   sh "chmod u+x $SCRIPT_TO_RUN"
   sh "dos2unix $SCRIPT_TO_RUN"
+  tag = "$imageType-$branch"
   sh "$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $backendEnvName cp $backendJps $tag"
 }
 
