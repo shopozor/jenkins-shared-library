@@ -21,7 +21,7 @@ def call(Map params) {
           }
         }
       }
-      stage('Publishing backend docker image') {
+      /*stage('Publishing backend docker image') {
         steps {
           build job: 'backend-publish-docker-image', parameters: [
             booleanParam(name: 'ENABLE_DEV_TOOLS', value: true),
@@ -85,7 +85,7 @@ def call(Map params) {
             helpers.retrieveTestResults(jenkinsEnvName, targetNodeGroup, targetPath, FRONTEND_NAME, sourceNodeGroup)
           }
         }
-      }
+      }*/
     }
     post {
       always {
