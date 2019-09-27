@@ -3,6 +3,7 @@ def call(Map params) {
   pipeline {
     agent any
     environment {  
+      BACKEND_BRANCH = 'dev'
       BACKEND_NAME = credentials("${params.frontendType}-backend-name-credentials") // contains envName + base jps url
       FRONTEND_NAME = credentials("${params.frontendType}-frontend-name-credentials") // contains envName
       JELASTIC_APP_CREDENTIALS = credentials('jelastic-app-credentials')
@@ -13,26 +14,46 @@ def call(Map params) {
       VIDEOS_FOLDER = 'videos'
     }
     stages {
+      stage('Remove me') {
+        steps {
+          script {
+            sh "env"
+          }
+        }
+      }
+      stage('Publishing backend docker image') {
+        steps {
+          build job: 'backend-publish-docker-image', parameters: [
+            booleanParam(name: 'ENABLE_DEV_TOOLS', value: true),
+            string(name: 'BRANCH', value: $BACKEND_BRANCH)
+          ]
+        }
+      }
       stage('Starting up backend environment') {
         environment {
-          GITHUB_CREDENTIALS = credentials('github-credentials')
           BACKEND_JPS = 'backend.jps'
           E2E_JPS = 'backend-e2e.jps'
+          GITHUB_CREDENTIALS = credentials('github-credentials')
         }
         steps {
           script {
-            helpers.prepareBackendConfiguration(GITHUB_CREDENTIALS_USR, GITHUB_CREDENTIALS_PSW, 'dev', BACKEND_JPS, E2E_JPS, BACKEND_NAME_PSW)
-            helpers.deploy(BACKEND_JPS, BACKEND_NAME_USR)
+            helpers.prepareBackendConfiguration(BACKEND_JPS, E2E_JPS, BACKEND_NAME_PSW)
+            helpers.deploy(BACKEND_JPS, BACKEND_NAME_USR, $BACKEND_BRANCH)
             helpers.resetDatabase(E2E_JPS, BACKEND_NAME_USR)
           }
         }
       }
-      stage('Building frontend app') {
-        environment {
-          GRAPHQL_API = "http://${BACKEND_NAME_USR}.hidora.com/graphql/"
-        }
+      stage('Publishing frontend docker image') {
         steps {
-          sh "yarn && yarn build"
+          script {
+            REPO = "${params.frontendType}-frontend"
+            // TODO: get branch name somehow (it's only for naming purposes, can be the commit nb)
+            BRANCH = 
+            GRAPHQL_API = "http://${BACKEND_NAME_USR}.hidora.com/graphql/"
+            ENABLE_DEV_TOOLS = 'true'
+            IMAGE_TYPE = 'e2e'
+            helpers.publishDockerImage(REPO, BRANCH, GRAPHQL_API, ENABLE_DEV_TOOLS, IMAGE_TYPE)
+          }
         }
       }
       stage('Starting up frontend and performing end-to-end tests') {
@@ -42,11 +63,13 @@ def call(Map params) {
         }
         steps {
           script {
-            def E2E_JPS = './common/e2e/e2e.jps'
-            def FRONTEND_JPS = './common/e2e/manifest.jps'
-            sh "cp cypress/e2e/Dockerfile ."
-            helpers.buildDockerImage()
+            // TODO: put the branch name here:
+            BRANCH = 
+            E2E_JPS = './common/e2e/e2e.jps'
+            FRONTEND_JPS = './common/e2e/manifest.jps'
             helpers.prepareFrontendConfiguration(FRONTEND_NAME, FRONTEND_JPS, E2E_JPS)
+            // TODO: also make sure that the correct docker image is deployed; 
+            //       we only tell what tag to use; the manifest should already have the correct image name
             helpers.deploy(FRONTEND_JPS, FRONTEND_NAME)
             helpers.runE2eTests(E2E_JPS, FRONTEND_NAME)
           }

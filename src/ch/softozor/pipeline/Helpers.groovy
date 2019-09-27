@@ -1,11 +1,8 @@
 package ch.softozor.pipeline
 
-def prepareBackendConfiguration(gitUser, gitPwd, gitBranch, backendJps, e2eJps, backendJpsUrl) {
+def prepareBackendConfiguration(e2eJps, backendJpsUrl) {
   sh "curl -o $backendJps $backendJpsUrl/manifest.jps"
-  sh "curl -o $e2eJps $backendJpsUrl/e2e.jps"
-  sh "sed -i \"s/GIT_USER/$gitUser/g\" $backendJps"
-  sh "sed -i \"s/GIT_PASSWORD/$gitPwd/g\" $backendJps"
-  sh "sed -i \"s/GIT_BRANCH/$gitBranch/g\" $backendJps"
+  sh "curl -o $e2eJps $backendJpsUrl/e2e/reset_database.jps"
 }
 
 def prepareFrontendConfiguration(frontendName, frontendJps, e2eJps) {
@@ -13,18 +10,23 @@ def prepareFrontendConfiguration(frontendName, frontendJps, e2eJps) {
   sh "sed -i \"s/FRONTEND_NAME/$frontendName/g\" $e2eJps"
 }
 
-def buildDockerImage() {
+def publishDockerImage(repo, branch, graphqlApi, enableDevTools, imageType) {
+  DOCKER_REPO = "softozor/shopozor-$REPO:$IMAGE_TYPE-$BRANCH"
+  sh "cp $IMAGE_TYPE/Dockerfile ."
+  sh "cp $IMAGE_TYPE/.dockerignore ."
   sh "docker login -u $DOCKER_CREDENTIALS_USR -p $DOCKER_CREDENTIALS_PSW"
-  sh "docker build -t $DOCKER_REPO ."
+  sh "docker build --build-arg GRAPHQL_API=$GRAPHQL_API --build-arg ENABLE_DEV_TOOLS=$ENABLE_DEV_TOOLS --network=host -t $DOCKER_REPO ."
   sh "docker push $DOCKER_REPO"
 }
 
-def deploy(backendJps, backendEnvName) {
+def deploy(backendJps, backendEnvName, tag) {
   sh "dos2unix ./common/e2e/helpers.sh"
+  sh "sed -i \"s/DEPLOY_MODE/e2e/g\" $backendJps"
+  sh "sed -i \"s/DOCKER_TAG/$tag/g\" $backendJps"
   SCRIPT_TO_RUN = './common/e2e/deploy-to-jelastic.sh'
-  sh "dos2unix $SCRIPT_TO_RUN"
   sh "chmod u+x $SCRIPT_TO_RUN"
-  sh "$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $backendEnvName cp $backendJps"
+  sh "dos2unix $SCRIPT_TO_RUN"
+  sh "$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $backendEnvName cp $backendJps $tag"
 }
 
 def runE2eTests(e2eJps, envName) {
