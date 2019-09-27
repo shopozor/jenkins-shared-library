@@ -14,14 +14,7 @@ def call(Map params) {
       VIDEOS_FOLDER = 'videos'
     }
     stages {
-      stage('Remove me') {
-        steps {
-          script {
-            sh "env"
-          }
-        }
-      }
-      /*stage('Publishing backend docker image') {
+      stage('Publishing backend docker image') {
         steps {
           build job: 'backend-publish-docker-image', parameters: [
             booleanParam(name: 'ENABLE_DEV_TOOLS', value: true),
@@ -47,12 +40,10 @@ def call(Map params) {
         steps {
           script {
             REPO = "${params.frontendType}-frontend"
-            // TODO: get branch name somehow (it's only for naming purposes, can be the commit nb)
-            BRANCH = 
             GRAPHQL_API = "http://${BACKEND_NAME_USR}.hidora.com/graphql/"
             ENABLE_DEV_TOOLS = 'true'
             IMAGE_TYPE = 'e2e'
-            helpers.publishDockerImage(REPO, BRANCH, GRAPHQL_API, ENABLE_DEV_TOOLS, IMAGE_TYPE)
+            helpers.publishDockerImage(FRONTEND_NAME, GIT_COMMIT, GRAPHQL_API, ENABLE_DEV_TOOLS, IMAGE_TYPE)
           }
         }
       }
@@ -63,14 +54,12 @@ def call(Map params) {
         }
         steps {
           script {
-            // TODO: put the branch name here:
-            BRANCH = 
             E2E_JPS = './common/e2e/e2e.jps'
             FRONTEND_JPS = './common/e2e/manifest.jps'
             helpers.prepareFrontendConfiguration(FRONTEND_NAME, FRONTEND_JPS, E2E_JPS)
             // TODO: also make sure that the correct docker image is deployed; 
             //       we only tell what tag to use; the manifest should already have the correct image name
-            helpers.deploy(FRONTEND_JPS, FRONTEND_NAME)
+            helpers.deploy(FRONTEND_JPS, FRONTEND_NAME, GIT_COMMIT)
             helpers.runE2eTests(E2E_JPS, FRONTEND_NAME)
           }
         }
@@ -85,7 +74,7 @@ def call(Map params) {
             helpers.retrieveTestResults(jenkinsEnvName, targetNodeGroup, targetPath, FRONTEND_NAME, sourceNodeGroup)
           }
         }
-      }*/
+      }
     }
     post {
       always {

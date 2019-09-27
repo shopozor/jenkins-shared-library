@@ -10,8 +10,8 @@ def prepareFrontendConfiguration(frontendName, frontendJps, e2eJps) {
   sh "sed -i \"s/FRONTEND_NAME/$frontendName/g\" $e2eJps"
 }
 
-def publishDockerImage(repo, branch, graphqlApi, enableDevTools, imageType) {
-  DOCKER_REPO = "softozor/shopozor-$repo:$imageType-$branch"
+def publishDockerImage(frontendName, branch, graphqlApi, enableDevTools, imageType) {
+  DOCKER_REPO = "softozor/$frontendName:$imageType-$branch"
   sh "cp ./common/$imageType/Dockerfile ."
   sh "cp ./common/$imageType/.dockerignore ."
   sh "docker login -u $DOCKER_CREDENTIALS_USR -p $DOCKER_CREDENTIALS_PSW"
