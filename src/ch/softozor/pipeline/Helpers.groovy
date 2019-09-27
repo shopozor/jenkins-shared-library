@@ -26,16 +26,21 @@ def publishFrontendDockerImage(frontendName, branch, graphqlApi, enableDevTools,
   sh "docker push $DOCKER_REPO"
 }
 
+def getJelasticScript(scriptFile) {
+  sh "curl -o $scriptFile https://raw.githubusercontent.com/shopozor/jelastic-shared-library/master/$scriptFile"
+  sh "dos2unix $scriptFile"
+  sh "chmod u+x $scriptFile"
+}
+
 def deploy(backendJps, appName, backendEnvName, branch, imageType) {
-  sh "dos2unix ./common/e2e/helpers.sh"
+  tag = "$imageType-$branch"
   sh "sed -i \"s/APP_NAME/$appName/g\" $backendJps"
   sh "sed -i \"s/IMAGE_TYPE/$imageType/g\" $backendJps"
   sh "sed -i \"s/BRANCH/$branch/g\" $backendJps"
-  SCRIPT_TO_RUN = './common/e2e/deploy-to-jelastic.sh'
-  sh "chmod u+x $SCRIPT_TO_RUN"
-  sh "dos2unix $SCRIPT_TO_RUN"
-  tag = "$imageType-$branch"
-  sh "$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $backendEnvName cp $backendJps $tag"
+  getJelasticScript('helpers.sh')
+  SCRIPT_TO_RUN = 'deploy-to-jelastic.sh'
+  getJelasticScript(SCRIPT_TO_RUN)
+  sh "./$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $backendEnvName cp $backendJps $tag"
 }
 
 def tagAndPush(tag, description) {
@@ -48,11 +53,10 @@ def tagAndPush(tag, description) {
 }
 
 def runE2eTests(e2eJps, envName) {
-  sh "dos2unix ./common/e2e/helpers.sh"
-  SCRIPT_TO_RUN = './common/e2e/run-e2e.sh'
-  sh "dos2unix $SCRIPT_TO_RUN"
-  sh "chmod u+x $SCRIPT_TO_RUN"
-  sh "$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $envName cp $e2eJps"
+  getJelasticScript('helpers.sh')
+  SCRIPT_TO_RUN = 'run-e2e.sh'
+  getJelasticScript(SCRIPT_TO_RUN)
+  sh "./$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $envName cp $e2eJps"
 }
 
 def resetDatabase(e2eJps, envName) {
@@ -69,11 +73,10 @@ def retrieveTestResults(jenkinsEnvName, targetNodeGroup, targetPath, frontendNam
   deleteFolder(TEST_REPORTS_FOLDER)
   deleteFolder(VIDEOS_FOLDER)
   deleteFolder(SCREENSHOTS_FOLDER)
-  sh "dos2unix ./common/e2e/helpers.sh"
-  SCRIPT_TO_RUN = './common/e2e/mount-test-results.sh'
-  sh "dos2unix $SCRIPT_TO_RUN"
-  sh "chmod u+x $SCRIPT_TO_RUN"
-  sh "$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $jenkinsEnvName $targetNodeGroup $targetPath $frontendName $sourceNodeGroup $PATH_TO_TEST_RESULTS"
+  getJelasticScript('helpers.sh')
+  SCRIPT_TO_RUN = 'mount-test-results.sh'
+  getJelasticScript(SCRIPT_TO_RUN)
+  sh "./$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $jenkinsEnvName $targetNodeGroup $targetPath $frontendName $sourceNodeGroup $PATH_TO_TEST_RESULTS"
   sh "cp -R ${targetPath}/cypress/${SCREENSHOTS_FOLDER} ."
   sh "cp -R ${targetPath}/cypress/${VIDEOS_FOLDER} ."
   sh "cp -R ${targetPath}/${TEST_REPORTS_FOLDER} ."
@@ -85,11 +88,10 @@ def buildArtifacts() {
 }
 
 def stopEnvironment(envName) {
-  sh "dos2unix ./common/e2e/helpers.sh"
-  SCRIPT_TO_RUN = './common/e2e/stop-jelastic-env.sh'
-  sh "dos2unix $SCRIPT_TO_RUN"
-  sh "chmod u+x $SCRIPT_TO_RUN"
-  sh "$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $envName"
+  getJelasticScript('helpers.sh')
+  SCRIPT_TO_RUN = 'stop-jelastic-env.sh'
+  getJelasticScript(SCRIPT_TO_RUN)
+  sh "./$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $envName"
 }
 
 return this
