@@ -1,13 +1,14 @@
 package ch.softozor.pipeline
 
-def prepareBackendConfiguration(e2eJps, backendJpsUrl) {
+def prepareBackendConfiguration(backendJps, e2eJps, backendJpsUrl) {
   sh "curl -o $backendJps $backendJpsUrl/manifest.jps"
   sh "curl -o $e2eJps $backendJpsUrl/e2e/reset_database.jps"
 }
 
-def prepareFrontendConfiguration(frontendName, frontendJps, e2eJps) {
-  sh "sed -i \"s/FRONTEND_NAME/$frontendName/g\" $frontendJps"
-  sh "sed -i \"s/FRONTEND_NAME/$frontendName/g\" $e2eJps"
+def prepareFrontendConfiguration(frontendJps, e2eJps, frontendJpsUrl) {
+  // TODO: download the jps files from the repositories! like for the backend
+  // sh "sed -i \"s/FRONTEND_NAME/$frontendName/g\" $frontendJps"
+  // sh "sed -i \"s/FRONTEND_NAME/$frontendName/g\" $e2eJps"
 }
 
 def publishBackendDockerImage(backendName, branch, enableDevTools, imageType) {
@@ -52,15 +53,17 @@ def tagAndPush(tag, description) {
   sh "git checkout $tag"
 }
 
-def runE2eTests(e2eJps, envName) {
+def runE2eTests(e2eJps, envName, appName, imageType) {
+  sh "sed -i \"s/APP_NAME/$appName/g\" $e2eJps"
+  sh "sed -i \"s/IMAGE_TYPE/$imageType/g\" $e2eJps"
   getJelasticScript('helpers.sh')
   SCRIPT_TO_RUN = 'run-e2e.sh'
   getJelasticScript(SCRIPT_TO_RUN)
   sh "./$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $envName cp $e2eJps"
 }
 
-def resetDatabase(e2eJps, envName) {
-  runE2eTests(e2eJps, envName)
+def resetDatabase(e2eJps, envName, appName, imageType) {
+  runE2eTests(e2eJps, envName, appName, imageType)
 }
 
 def deleteFolder(folderName) {

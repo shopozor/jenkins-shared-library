@@ -3,8 +3,10 @@ def call(Map params) {
   pipeline {
     agent any
     environment {  
+      BACKEND_APP_NAME = 'shopozor-backend'
       BACKEND_BRANCH = 'dev'
       BACKEND_NAME = credentials("${params.frontendType}-backend-name-credentials") // contains envName + base jps url
+      FRONTEND_APP_NAME = "shopozor-${params.frontendType}-frontend"
       FRONTEND_NAME = credentials("${params.frontendType}-frontend-name-credentials") // contains envName
       IMAGE_TYPE = 'e2e'
       JELASTIC_APP_CREDENTIALS = credentials('jelastic-app-credentials')
@@ -33,8 +35,8 @@ def call(Map params) {
         steps {
           script {
             helpers.prepareBackendConfiguration(BACKEND_JPS, E2E_JPS, BACKEND_NAME_PSW)
-            helpers.deploy(BACKEND_JPS, BACKEND_NAME_USR, BACKEND_BRANCH, IMAGE_TYPE)
-            helpers.resetDatabase(E2E_JPS, BACKEND_NAME_USR)
+            helpers.deploy(BACKEND_JPS, BACKEND_APP_NAME, BACKEND_NAME_USR, BACKEND_BRANCH, IMAGE_TYPE)
+            helpers.resetDatabase(E2E_JPS, BACKEND_NAME_USR, BACKEND_APP_NAME, IMAGE_TYPE)
           }
         }
       }
@@ -44,23 +46,22 @@ def call(Map params) {
             REPO = "${params.frontendType}-frontend"
             GRAPHQL_API = "http://${BACKEND_NAME_USR}.hidora.com/graphql/"
             ENABLE_DEV_TOOLS = 'true'
-            IMAGE_TYPE = 'e2e'
-            helpers.publishFrontendDockerImage(FRONTEND_NAME, GIT_COMMIT, GRAPHQL_API, ENABLE_DEV_TOOLS, IMAGE_TYPE)
+            helpers.publishFrontendDockerImage(FRONTEND_APP_NAME, GIT_COMMIT, GRAPHQL_API, ENABLE_DEV_TOOLS, IMAGE_TYPE)
           }
         }
       }
       stage('Starting up frontend and performing end-to-end tests') {
         environment {
           DOCKER_CREDENTIALS = credentials('docker-credentials')
-          DOCKER_REPO = "softozor/${FRONTEND_NAME}"
+          DOCKER_REPO = "softozor/${FRONTEND_APP_NAME}"
         }
         steps {
           script {
-            E2E_JPS = './common/e2e/e2e.jps'
             FRONTEND_JPS = './common/manifest.jps'
-            helpers.prepareFrontendConfiguration(FRONTEND_NAME, FRONTEND_JPS, E2E_JPS)
-            helpers.deploy(FRONTEND_JPS, FRONTEND_NAME, GIT_COMMIT, IMAGE_TYPE)
-            helpers.runE2eTests(E2E_JPS, FRONTEND_NAME)
+            helpers.deploy(FRONTEND_JPS, FRONTEND_APP_NAME, FRONTEND_NAME, GIT_COMMIT, IMAGE_TYPE)
+            
+            E2E_JPS = './common/e2e/e2e.jps'
+            helpers.runE2eTests(E2E_JPS, FRONTEND_NAME, FRONTEND_APP_NAME, IMAGE_TYPE)
           }
         }
       }
