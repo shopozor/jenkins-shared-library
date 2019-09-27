@@ -11,11 +11,11 @@ def prepareFrontendConfiguration(frontendName, frontendJps, e2eJps) {
 }
 
 def publishDockerImage(repo, branch, graphqlApi, enableDevTools, imageType) {
-  DOCKER_REPO = "softozor/shopozor-$REPO:$IMAGE_TYPE-$BRANCH"
-  sh "cp $IMAGE_TYPE/Dockerfile ."
-  sh "cp $IMAGE_TYPE/.dockerignore ."
+  DOCKER_REPO = "softozor/shopozor-$repo:$imageType-$branch"
+  sh "cp ./common/$imageType/Dockerfile ."
+  sh "cp ./common/$imageType/.dockerignore ."
   sh "docker login -u $DOCKER_CREDENTIALS_USR -p $DOCKER_CREDENTIALS_PSW"
-  sh "docker build --build-arg GRAPHQL_API=$GRAPHQL_API --build-arg ENABLE_DEV_TOOLS=$ENABLE_DEV_TOOLS --network=host -t $DOCKER_REPO ."
+  sh "docker build --build-arg GRAPHQL_API=$graphqlApi --build-arg ENABLE_DEV_TOOLS=$enableDevTools --network=host -t $DOCKER_REPO ."
   sh "docker push $DOCKER_REPO"
 }
 
