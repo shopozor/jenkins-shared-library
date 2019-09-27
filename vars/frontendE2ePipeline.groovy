@@ -45,7 +45,7 @@ def call(Map params) {
             GRAPHQL_API = "http://${BACKEND_NAME_USR}.hidora.com/graphql/"
             ENABLE_DEV_TOOLS = 'true'
             IMAGE_TYPE = 'e2e'
-            helpers.publishDockerImage(FRONTEND_NAME, GIT_COMMIT, GRAPHQL_API, ENABLE_DEV_TOOLS, IMAGE_TYPE)
+            helpers.publishFrontendDockerImage(FRONTEND_NAME, GIT_COMMIT, GRAPHQL_API, ENABLE_DEV_TOOLS, IMAGE_TYPE)
           }
         }
       }

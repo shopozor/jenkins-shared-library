@@ -10,7 +10,14 @@ def prepareFrontendConfiguration(frontendName, frontendJps, e2eJps) {
   sh "sed -i \"s/FRONTEND_NAME/$frontendName/g\" $e2eJps"
 }
 
-def publishDockerImage(frontendName, branch, graphqlApi, enableDevTools, imageType) {
+def publishBackendDockerImage(backendName, branch, enableDevTools, imageType) {
+  DOCKER_REPO = "softozor/$backendName:$imageType-$branch"
+  sh "docker login -u $DOCKER_CREDENTIALS_USR -p $DOCKER_CREDENTIALS_PSW"
+  sh "docker build --build-arg ENABLE_DEV_TOOLS=$enableDevTools --network=host -t $DOCKER_REPO ."
+  sh "docker push $DOCKER_REPO"
+}
+
+def publishFrontendDockerImage(frontendName, branch, graphqlApi, enableDevTools, imageType) {
   DOCKER_REPO = "softozor/$frontendName:$imageType-$branch"
   sh "cp ./common/$imageType/Dockerfile ."
   sh "cp ./common/$imageType/.dockerignore ."
@@ -28,6 +35,15 @@ def deploy(backendJps, backendEnvName, branch, imageType) {
   sh "chmod u+x $SCRIPT_TO_RUN"
   sh "dos2unix $SCRIPT_TO_RUN"
   sh "$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $backendEnvName cp $backendJps $tag"
+}
+
+def tagAndPush(tag, description) {
+  originUrl = "https://$GITHUB_CREDENTIALS_USR:$GITHUB_CREDENTIALS_PSW@" + GIT_URL.drop(8)
+  sh "git remote rm origin"
+  sh "git remote add origin $originUrl"
+  sh "git tag $tag -m \"$description\""
+  sh "git push origin $tag"
+  sh "git checkout $tag"
 }
 
 def runE2eTests(e2eJps, envName) {
