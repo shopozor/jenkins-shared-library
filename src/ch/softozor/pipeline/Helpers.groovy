@@ -1,14 +1,8 @@
 package ch.softozor.pipeline
 
-def prepareBackendConfiguration(backendJps, e2eJps, backendJpsUrl) {
+def getManifests(backendJps, e2eJps, backendJpsUrl) {
   sh "curl -o $backendJps $backendJpsUrl/manifest.jps"
-  sh "curl -o $e2eJps $backendJpsUrl/e2e/reset_database.jps"
-}
-
-def prepareFrontendConfiguration(frontendJps, e2eJps, frontendJpsUrl) {
-  // TODO: download the jps files from the repositories! like for the backend
-  // sh "sed -i \"s/FRONTEND_NAME/$frontendName/g\" $frontendJps"
-  // sh "sed -i \"s/FRONTEND_NAME/$frontendName/g\" $e2eJps"
+  sh "curl -o $e2eJps $backendJpsUrl/e2e/e2e.jps"
 }
 
 def publishBackendDockerImage(backendName, branch, enableDevTools, imageType) {
@@ -73,21 +67,19 @@ def deleteFolder(folderName) {
 }
 
 def retrieveTestResults(jenkinsEnvName, targetNodeGroup, targetPath, frontendName, sourceNodeGroup) {
-  deleteFolder(TEST_REPORTS_FOLDER)
-  deleteFolder(VIDEOS_FOLDER)
-  deleteFolder(SCREENSHOTS_FOLDER)
+  sh "rm -Rf ${frontendName}"
   getJelasticScript('helpers.sh')
   SCRIPT_TO_RUN = 'mount-test-results.sh'
   getJelasticScript(SCRIPT_TO_RUN)
   sh "./$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $jenkinsEnvName $targetNodeGroup $targetPath $frontendName $sourceNodeGroup $PATH_TO_TEST_RESULTS"
-  sh "cp -R ${targetPath}/cypress/${SCREENSHOTS_FOLDER} ."
-  sh "cp -R ${targetPath}/cypress/${VIDEOS_FOLDER} ."
-  sh "cp -R ${targetPath}/${TEST_REPORTS_FOLDER} ."
+  sh "cp -R ${targetPath}/cypress/${SCREENSHOTS_FOLDER} ./${frontendName}/${SCREENSHOTS_FOLDER}"
+  sh "cp -R ${targetPath}/cypress/${VIDEOS_FOLDER} ./${frontendName}/${VIDEOS_FOLDER}"
+  sh "cp -R ${targetPath}/${TEST_REPORTS_FOLDER} ./${frontendName}/${TEST_REPORTS_FOLDER}"
 }
 
 def buildArtifacts() {
-  archiveArtifacts artifacts: "${VIDEOS_FOLDER}/**/*.mp4, ${SCREENSHOTS_FOLDER}/**/*.png"
-  junit "${TEST_REPORTS_FOLDER}/*.xml"
+  archiveArtifacts artifacts: "**/${VIDEOS_FOLDER}/**/*.mp4, **/${SCREENSHOTS_FOLDER}/**/*.png"
+  junit "**/${TEST_REPORTS_FOLDER}/*.xml"
 }
 
 def stopEnvironment(envName) {

@@ -34,7 +34,7 @@ def call(Map params) {
         }
         steps {
           script {
-            helpers.prepareBackendConfiguration(BACKEND_JPS, E2E_JPS, BACKEND_NAME_PSW)
+            helpers.getManifests(BACKEND_JPS, E2E_JPS, BACKEND_NAME_PSW)
             helpers.deploy(BACKEND_JPS, BACKEND_APP_NAME, BACKEND_NAME_USR, BACKEND_BRANCH, IMAGE_TYPE)
             helpers.resetDatabase(E2E_JPS, BACKEND_NAME_USR, BACKEND_APP_NAME, IMAGE_TYPE)
           }
