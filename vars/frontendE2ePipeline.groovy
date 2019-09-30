@@ -76,6 +76,18 @@ def call(Map params) {
           }
         }
       }
+      stage('Building specification') {
+        environment {
+          SOFTOZOR_CREDENTIALS = credentials('softozor-credentials')
+        }
+        steps {
+          script {
+            if(GIT_BRANCH == 'origin/dev' || GIT_BRANCH == 'origin/master') {
+              helpers.generateSpecification("$WORKSPACE/cypress/e2e", params.frontendType, GIT_COMMIT)
+            }
+          }
+        }
+      }
     }
     post {
       always {
@@ -83,7 +95,6 @@ def call(Map params) {
           helpers.stopEnvironment(BACKEND_NAME_USR)
           helpers.stopEnvironment(FRONTEND_NAME)
           helpers.buildArtifacts()
-          // TODO: build spec here or do that in the merger job?
         }
       }
     }
