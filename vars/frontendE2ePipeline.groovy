@@ -83,6 +83,7 @@ def call(Map params) {
           helpers.stopEnvironment(BACKEND_NAME_USR)
           helpers.stopEnvironment(FRONTEND_NAME)
           helpers.buildArtifacts()
+          // TODO: build spec here or do that in the merger job?
         }
       }
     }

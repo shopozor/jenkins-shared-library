@@ -89,4 +89,10 @@ def stopEnvironment(envName) {
   sh "./$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $envName"
 }
 
+def generateSpecification(featureDir, repo, commitNb) {
+  sh "mono /opt/pickles/Pickles.exe --feature-directory=$featureDir --output-directory=specification --system-under-test-name=$repo --system-under-test-version=$commitNb --language=fr --documentation-format=dhtml --exp --et 'in-preparation'"
+  sh "sshpass -p $SOFTOZOR_CREDENTIALS_PSW ssh -o StrictHostKeyChecking=no $SOFTOZOR_CREDENTIALS_USR@softozor.ch 'rm -Rf ~/www/www.softozor.ch/shopozor/$repo/*'"
+  sh "sshpass -p $SOFTOZOR_CREDENTIALS_PSW scp -o StrictHostKeyChecking=no -r specification/* $SOFTOZOR_CREDENTIALS_USR@softozor.ch:~/www/www.softozor.ch/shopozor/$repo/"
+}
+
 return this
