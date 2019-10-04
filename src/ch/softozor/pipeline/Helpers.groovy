@@ -32,15 +32,15 @@ def getJelasticScript(scriptFile) {
   sh "chmod u+x $scriptFile"
 }
 
-def deploy(backendJps, appName, backendEnvName, branch, imageType) {
+def deploy(installJps, appName, envName, branch, imageType) {
   tag = "$imageType-$branch"
-  sh "sed -i \"s/APP_NAME/$appName/g\" $backendJps"
-  sh "sed -i \"s/IMAGE_TYPE/$imageType/g\" $backendJps"
-  sh "sed -i \"s/BRANCH/$branch/g\" $backendJps"
+  sh "sed -i \"s/APP_NAME/$appName/g\" $installJps"
+  sh "sed -i \"s/IMAGE_TYPE/$imageType/g\" $installJps"
+  sh "sed -i \"s/BRANCH/$branch/g\" $installJps"
   getJelasticScript('helpers.sh')
   SCRIPT_TO_RUN = 'deploy-to-jelastic.sh'
   getJelasticScript(SCRIPT_TO_RUN)
-  sh "./$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $backendEnvName cp $backendJps $tag"
+  sh "./$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $envName cp $installJps $tag"
 }
 
 def tagAndPush(tag, description) {
