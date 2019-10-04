@@ -1,8 +1,13 @@
 package ch.softozor.pipeline
 
-def getManifests(backendJps, e2eJps, backendJpsUrl) {
-  sh "curl -o $backendJps $backendJpsUrl/manifest.jps"
-  sh "curl -o $e2eJps $backendJpsUrl/e2e/e2e.jps"
+def getBackendE2eManifests(installJps, e2eJps, jpsBaseUrl) {
+  sh "curl -o $installJps $jpsBaseUrl/e2e/install.jps"
+  sh "curl -o $e2eJps $jpsBaseUrl/e2e/e2e.jps"
+}
+
+def getFrontendE2eManifests(installJps, e2eJps, jpsBaseUrl) {
+  sh "curl -o $installJps $jpsBaseUrl/manifest.jps"
+  sh "curl -o $e2eJps $jpsBaseUrl/e2e/e2e.jps"
 }
 
 def publishBackendDockerImage(backendName, branch, enableDevTools, imageType) {
