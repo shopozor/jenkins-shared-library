@@ -85,7 +85,10 @@ def call(Map params) {
         steps {
           script {
             if(GIT_BRANCH == 'origin/dev' || GIT_BRANCH == 'origin/master') {
-              helpers.generateSpecification("$WORKSPACE/cypress/e2e", params.frontendType, GIT_COMMIT)
+              build job: 'frontend-spec', parameters: [
+                string(name: 'BRANCH', value: GIT_BRANCH.split('/')[1]),
+                string(name: 'REPO', value: params.frontendType)
+              ]
             }
           }
         }
