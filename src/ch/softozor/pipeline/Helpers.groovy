@@ -71,12 +71,16 @@ def deleteFolder(folderName) {
   }
 }
 
+def mountRemoteFolder(targetEnvName, targetNodeGroup, targetPath, sourceEnvName, sourceNodeGroup, sourcePath) {
+  getJelasticScript('helpers.sh')
+  SCRIPT_TO_RUN = 'mount-remote-folder.sh'
+  getJelasticScript(SCRIPT_TO_RUN)
+  sh "./$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $targetEnvName $targetNodeGroup $targetPath $sourceEnvName $sourceNodeGroup $sourcePath" 
+}
+
 def retrieveTestResults(jenkinsEnvName, targetNodeGroup, targetPath, frontendName, sourceNodeGroup) {
   sh "rm -Rf ${frontendName}"
-  getJelasticScript('helpers.sh')
-  SCRIPT_TO_RUN = 'mount-test-results.sh'
-  getJelasticScript(SCRIPT_TO_RUN)
-  sh "./$SCRIPT_TO_RUN $JELASTIC_APP_CREDENTIALS_USR $JELASTIC_APP_CREDENTIALS_PSW $JELASTIC_CREDENTIALS_USR $JELASTIC_CREDENTIALS_PSW $jenkinsEnvName $targetNodeGroup $targetPath $frontendName $sourceNodeGroup $PATH_TO_TEST_RESULTS"
+  mountRemoteFolder($jenkinsEnvName, $targetNodeGroup, $targetPath, $frontendName, $sourceNodeGroup, $PATH_TO_TEST_RESULTS)
   sh "cp -R ${targetPath}/cypress/${SCREENSHOTS_FOLDER} ./${frontendName}/${SCREENSHOTS_FOLDER}"
   sh "cp -R ${targetPath}/cypress/${VIDEOS_FOLDER} ./${frontendName}/${VIDEOS_FOLDER}"
   sh "cp -R ${targetPath}/${TEST_REPORTS_FOLDER} ./${frontendName}/${TEST_REPORTS_FOLDER}"
