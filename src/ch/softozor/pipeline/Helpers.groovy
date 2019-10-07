@@ -1,7 +1,7 @@
 package ch.softozor.pipeline
 
 def getBackendE2eManifests(installJps, e2eJps, jpsBaseUrl) {
-  sh "curl -o $installJps $jpsBaseUrl/e2e/install.jps"
+  sh "curl -o $installJps $jpsBaseUrl/manifest.jps"
   sh "curl -o $e2eJps $jpsBaseUrl/e2e/e2e.jps"
 }
 
