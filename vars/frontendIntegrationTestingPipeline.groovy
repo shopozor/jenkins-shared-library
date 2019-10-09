@@ -3,7 +3,7 @@ def call() {
   pipeline {
     agent {
       docker {
-        image 'cypress/base:12.1.0'
+        image 'cypress/browsers:node12.6.0-chrome77'
       }
     }
     environment {
