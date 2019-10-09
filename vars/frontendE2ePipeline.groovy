@@ -26,6 +26,16 @@ def call(Map params) {
           ]
         }
       }
+      stage('Publishing frontend docker image') {
+        steps {
+          script {
+            REPO = "${params.frontendType}-frontend"
+            GRAPHQL_API = "http://${BACKEND_NAME_USR}.hidora.com/graphql/"
+            ENABLE_DEV_TOOLS = 'true'
+            helpers.publishFrontendDockerImage(FRONTEND_APP_NAME, GIT_COMMIT, GRAPHQL_API, ENABLE_DEV_TOOLS, IMAGE_TYPE)
+          }
+        }
+      }
       stage('Starting up backend environment') {
         environment {
           BACKEND_JPS = 'backend.jps'
@@ -37,16 +47,6 @@ def call(Map params) {
             helpers.getBackendE2eManifests(BACKEND_JPS, E2E_JPS, BACKEND_NAME_PSW)
             helpers.deploy(BACKEND_JPS, BACKEND_APP_NAME, BACKEND_NAME_USR, BACKEND_BRANCH, IMAGE_TYPE)
             helpers.resetDatabase(E2E_JPS, BACKEND_NAME_USR, BACKEND_APP_NAME, IMAGE_TYPE)
-          }
-        }
-      }
-      stage('Publishing frontend docker image') {
-        steps {
-          script {
-            REPO = "${params.frontendType}-frontend"
-            GRAPHQL_API = "http://${BACKEND_NAME_USR}.hidora.com/graphql/"
-            ENABLE_DEV_TOOLS = 'true'
-            helpers.publishFrontendDockerImage(FRONTEND_APP_NAME, GIT_COMMIT, GRAPHQL_API, ENABLE_DEV_TOOLS, IMAGE_TYPE)
           }
         }
       }
