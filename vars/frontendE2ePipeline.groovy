@@ -6,6 +6,7 @@ def call(Map params) {
       BACKEND_APP_NAME = 'shopozor-backend'
       BACKEND_BRANCH = 'dev'
       BACKEND_NAME = credentials("${params.frontendType}-backend-name-credentials") // contains envName + base jps url
+      DOCKER_CREDENTIALS = credentials('docker-credentials')
       FRONTEND_APP_NAME = "shopozor-${params.frontendType}-frontend"
       FRONTEND_NAME = credentials("${params.frontendType}-frontend-name-credentials") // contains envName
       IMAGE_TYPE = 'e2e'
