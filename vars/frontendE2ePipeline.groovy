@@ -62,7 +62,8 @@ def call(Map params) {
             helpers.deploy(FRONTEND_JPS, FRONTEND_APP_NAME, FRONTEND_NAME, GIT_COMMIT, IMAGE_TYPE)
             
             helpers.mountRemoteFolder(FRONTEND_NAME, 'cp', '/home/node/emails', BACKEND_NAME_USR, 'cp', '/app/emails')
-            
+            helpers.mountRemoteFolder(FRONTEND_NAME, 'cp', '/home/node/cypress/fixtures', BACKEND_NAME_USR, 'cp', '/app/features/fixtures/large')
+
             E2E_JPS = './common/e2e/e2e.jps'
             helpers.runE2eTests(E2E_JPS, FRONTEND_NAME, FRONTEND_APP_NAME, IMAGE_TYPE)
           }
