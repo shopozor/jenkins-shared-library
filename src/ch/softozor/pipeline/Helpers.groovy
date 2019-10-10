@@ -79,7 +79,10 @@ def mountRemoteFolder(targetEnvName, targetNodeGroup, targetPath, sourceEnvName,
 }
 
 def retrieveTestResults(jenkinsEnvName, targetNodeGroup, targetPath, frontendName, sourceNodeGroup) {
-  sh "rm -Rf ${frontendName}"
+  // we create the frontendName folder in the case where we run the e2e tests from the backend
+  // in that case, we run the tests on the consumer and management frontends --> all results are coming to 
+  // the jenkins, from both frontends!
+  sh "rm -Rf ${frontendName} && mkdir ${frontendName}"
   // here we mount the /home/node of the frontend on /mnt/frontendName of jenkins
   mountRemoteFolder(jenkinsEnvName, targetNodeGroup, targetPath, frontendName, sourceNodeGroup, PATH_TO_TEST_RESULTS)
   sh "cp -R ${targetPath}/cypress/${SCREENSHOTS_FOLDER} ./${frontendName}/${SCREENSHOTS_FOLDER}"
