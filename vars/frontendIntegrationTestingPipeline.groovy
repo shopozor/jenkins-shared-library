@@ -3,6 +3,7 @@ def call() {
   pipeline {
     agent {
       docker {
+        // TODO: do we really want to keep going with this huge image?
         image 'cypress/browsers:node12.6.0-chrome77'
       }
     }
