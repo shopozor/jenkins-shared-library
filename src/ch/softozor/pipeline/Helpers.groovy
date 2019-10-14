@@ -85,9 +85,9 @@ def retrieveTestResults(jenkinsEnvName, targetNodeGroup, targetPath, frontendNam
   sh "rm -Rf ${frontendName} && mkdir ${frontendName}"
   // here we mount the /home/node of the frontend on /mnt/frontendName of jenkins
   mountRemoteFolder(jenkinsEnvName, targetNodeGroup, targetPath, frontendName, sourceNodeGroup, PATH_TO_TEST_RESULTS)
-  sh "cp -R ${targetPath}/cypress/${SCREENSHOTS_FOLDER} ./${frontendName}/${SCREENSHOTS_FOLDER}"
-  sh "cp -R ${targetPath}/cypress/${VIDEOS_FOLDER} ./${frontendName}/${VIDEOS_FOLDER}"
-  sh "cp -R ${targetPath}/${TEST_REPORTS_FOLDER} ./${frontendName}/${TEST_REPORTS_FOLDER}"
+  sh "[ -d \"${targetPath}/cypress/${SCREENSHOTS_FOLDER}\" ] && cp -R ${targetPath}/cypress/${SCREENSHOTS_FOLDER} ./${frontendName}/${SCREENSHOTS_FOLDER}"
+  sh "[ -d \"${targetPath}/cypress/${VIDEOS_FOLDER}\" ] && cp -R ${targetPath}/cypress/${VIDEOS_FOLDER} ./${frontendName}/${VIDEOS_FOLDER}"
+  sh "[ -d \"${targetPath}/${TEST_REPORTS_FOLDER}\" ] && cp -R ${targetPath}/${TEST_REPORTS_FOLDER} ./${frontendName}/${TEST_REPORTS_FOLDER}"
 }
 
 def buildArtifacts() {
