@@ -85,9 +85,9 @@ def retrieveTestResults(jenkinsEnvName, targetNodeGroup, targetPath, frontendNam
   sh "rm -Rf ${frontendName} && mkdir ${frontendName}"
   // here we mount the /home/node of the frontend on /mnt/frontendName of jenkins
   mountRemoteFolder(jenkinsEnvName, targetNodeGroup, targetPath, frontendName, sourceNodeGroup, PATH_TO_TEST_RESULTS)
-  sh "if -d \"${targetPath}/cypress/${SCREENSHOTS_FOLDER}\"; then cp -R ${targetPath}/cypress/${SCREENSHOTS_FOLDER} ./${frontendName}/${SCREENSHOTS_FOLDER}; fi"
-  sh "if -d \"${targetPath}/cypress/${VIDEOS_FOLDER}\"; then cp -R ${targetPath}/cypress/${VIDEOS_FOLDER} ./${frontendName}/${VIDEOS_FOLDER}; fi"
-  sh "if -d \"${targetPath}/${TEST_REPORTS_FOLDER}\"; then cp -R ${targetPath}/${TEST_REPORTS_FOLDER} ./${frontendName}/${TEST_REPORTS_FOLDER}; fi"
+  sh "if test -d \"${targetPath}/cypress/${SCREENSHOTS_FOLDER}\"; then cp -R ${targetPath}/cypress/${SCREENSHOTS_FOLDER} ./${frontendName}/${SCREENSHOTS_FOLDER}; fi"
+  sh "if test -d \"${targetPath}/cypress/${VIDEOS_FOLDER}\"; then cp -R ${targetPath}/cypress/${VIDEOS_FOLDER} ./${frontendName}/${VIDEOS_FOLDER}; fi"
+  sh "if test -d \"${targetPath}/${TEST_REPORTS_FOLDER}\"; then cp -R ${targetPath}/${TEST_REPORTS_FOLDER} ./${frontendName}/${TEST_REPORTS_FOLDER}; fi"
 }
 
 def buildArtifacts() {
