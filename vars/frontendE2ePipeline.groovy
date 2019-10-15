@@ -89,7 +89,7 @@ def call(Map params) {
             if(GIT_BRANCH == 'origin/dev' || GIT_BRANCH == 'origin/master') {
               build job: 'frontend-spec', parameters: [
                 string(name: 'BRANCH', value: GIT_BRANCH.split('/')[1]),
-                string(name: 'REPO', value: params.frontendType)
+                string(name: 'REPO', value: "${params.frontendType}-frontend")
               ]
             }
           }
