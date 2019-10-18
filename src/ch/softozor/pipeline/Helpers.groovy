@@ -11,16 +11,16 @@ def getFrontendE2eManifests(installJps, e2eJps, jpsBaseUrl) {
 }
 
 def publishBackendDockerImage(backendName, branch, enableDevTools, imageType) {
-  DOCKER_REPO = "softozor/$backendName:$imageType-$branch"
+  DOCKER_REPO = "shopozor/$backendName:$imageType-$branch"
   sh "docker login -u $DOCKER_CREDENTIALS_USR -p $DOCKER_CREDENTIALS_PSW"
   sh "docker build --build-arg ENABLE_DEV_TOOLS=$enableDevTools --network=host -t $DOCKER_REPO ."
   sh "docker push $DOCKER_REPO"
 }
 
 def publishFrontendDockerImage(frontendName, branch, graphqlApi, enableDevTools, imageType) {
-  DOCKER_REPO = "softozor/$frontendName:$imageType-$branch"
-  sh "cp ./common/$imageType/Dockerfile ."
-  sh "cp ./common/$imageType/.dockerignore ."
+  DOCKER_REPO = "shopozor/$frontendName:$imageType-$branch"
+  sh "cp ./$imageType/Dockerfile ."
+  sh "cp ./$imageType/.dockerignore ."
   sh "docker login -u $DOCKER_CREDENTIALS_USR -p $DOCKER_CREDENTIALS_PSW"
   sh "docker build --build-arg GRAPHQL_API=$graphqlApi --build-arg ENABLE_DEV_TOOLS=$enableDevTools --network=host -t $DOCKER_REPO ."
   sh "docker push $DOCKER_REPO"
