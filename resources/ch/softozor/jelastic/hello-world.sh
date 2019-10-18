@@ -1,3 +1,4 @@
 #! /bin/bash
 
-echo "Hello world!"
+. helpers.sh
+echo $STRING
