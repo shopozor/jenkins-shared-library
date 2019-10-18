@@ -1,1 +1,0 @@
-STRING="Hello world!"
